@@ -6,7 +6,7 @@ This security layer inadequately handles A/B storage for files in RepyV2.
 Note:
     This security layer uses encasementlib.r2py, restrictions.default, repy.py and Python
     Also you need to give it an application to run.
-    python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py 
+    # instructed to delete this -- python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py 
     
     """ 
 TYPE="type"
@@ -31,8 +31,9 @@ class ABFile():
       self.Bfile = openfile(self.Bfn,create)
       self.Afile.writeat('SE',0)
 
+    if self.Afile[0] == 'S' and self.Afile[-1] == 'E' 
 
-  def writeat(self,data,offset):
+       def writeat(self,data,offset):
     
     # Write the requested data to the B file using the sandbox's writeat call
     self.Bfile.writeat(data,offset)
