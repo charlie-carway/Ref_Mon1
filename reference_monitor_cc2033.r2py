@@ -6,7 +6,8 @@ This security layer inadequately handles A/B storage for files in RepyV2.
 Note:
     This security layer uses encasementlib.r2py, restrictions.default, repy.py and Python
     Also you need to give it an application to run.
-    # instructed to delete this -- python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py 
+    ** instructed to delete this?  it's in comments? -- python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py 
+    -->edited as shown on zoom -- python3 repy.py encasementlib.r2py reference_monitor_cc2033.r2py attack_layer_1cc2033.r2py 
     
     """ 
 TYPE="type"
@@ -18,9 +19,12 @@ FUNC="func"
 OBJC="objc"
 
 class ABFile():
-  log listfiles()                                   # added to determine what files exist if any, need to add decision tree below this
+  # log listfiles()                                   # added to determine what files exist if any, need to add decision tree below this
+  # files = os.listdir()
+  # log (files)
   def __init__(self,filename,create):               # 2 parms passed from the programmer - application
-    # globals                                       need to check on init whether files exist - can use listfiles()
+  listfiles()                                      # added to determine what files exist if any, need to add decision tree below this
+  # globals                                       need to check on init whether files exist - can use listfiles()
     mycontext['debug'] = False   
     # local (per object) reference to the underlying file
     self.Afn = filename+'.a'                        # self.Afn & self.Bfn are only the file names
@@ -36,8 +40,31 @@ class ABFile():
       self.Bfile = openfile(self.Bfn,False)
 
     def writeat(self,data,offset):               # decreased indent to align outside if above
+    # * Test if the AB file can correctly handle writes past at the end of the file so, like we said, we have this offset, right um.
+    # Q: What happens if your offset is greater than your file length does your program out crash if that's the case, 
+    # or do you handle it gracefully quietly and just not allow them to write to a portion of the file that doesn't exist or read, etc.
+    # Tests if the Avi file class can correctly keep track of file length.
+    # Tests if the ab file class can successfully open and right valid data, so this is testing whether or not., An invalid right makes it through the A file or, 
+    #   Or if a valid right doesn't make it through the A file etc there's also a lot of people have issues on this because there's it's the first time that.
+    #    people realize that you can open a file with create twice, with creat equals True twice.
+    #  Gradescope says IACOR -- test is trying to Initiate a file, then Append to the file, then Close the file, then Open again, then Read it 
+    #  There it is um nexus test if the Avi file can handle invalid rights properly right similar to valid rights, 
+    #     test if the Avi file can handle multiple valid rights so multiple valid things are called and written to the file.
+    # Test to see if the Avi file class can properly handle rights, starting with a space, so we say that the first byte in order to be considered valid
+    #   must be capital S and last byte must be capital E it's important that we say byte here and not letter. 
+    # test of the Avi file can correctly handle resource contention during threading well in this case you have multiple threads attempting to write to and 
+    #    read from the same file, as I stated before, only one thread will own the file, at a time, if a thread owns a file all other threads must wait 
+    #    until that thread closes the file before it's allowed to access it.
+    # And then finally test if the AB file class can successfully right valid data to an existing file so basically it's going to create a file
+    #    close that file reopen it and then try to write valid data.
+    # Those are the 10 test cases there's another one in there that's test the base case provided in the assignment description so literally does your code 
+    #  run with the test case that's in the assignment description.  Plus the -10 value to avoid cheating autograder
+    # 
     
-    # Write the requested data to the B file using the sandbox's writeat call
+    
+    if offset.writeat >=0 and <= len(self.Bfile)
+    
+   # Write the requested data to the B file using the sandbox's writeat call
     self.Bfile.writeat(data,offset)
   
   def readat(self,bytes,offset):
@@ -66,6 +93,7 @@ sec_file_def = {"obj-type":ABFile,
                 "close":{"type":"func","args":None,"exceptions":None,"return":(bool,type(None)),"target":ABFile.close}
            }
 
+
 CHILD_CONTEXT_DEF["ABopenfile"] = {TYPE:OBJC,ARGS:(str,bool),EXCP:Exception,RETURN:sec_file_def,TARGET:ABopenfile}
 
 # Execute the user code
@@ -74,20 +102,20 @@ secure_dispatch_module()
 #
 # Assignment sample attack code added here to eliminate need for two input files
 #
-if "testfile.txt.a" in listfiles():
-  removefile("testfile.txt.a")
-if "testfile.txt.b" in listfiles():
-  removefile("testfile.txt.b")
-myfile=ABopenfile("testfile.txt",True)  #Create an AB file
+###if "testfile.txt.a" in listfiles():
+###  removefile("testfile.txt.a")
+###if "testfile.txt.b" in listfiles():
+###  removefile("testfile.txt.b")
+###myfile=ABopenfile("testfile.txt",True)  #Create an AB file
 
 # I should get 'SE' when reading an empty file...
-assert('SE' == myfile.readat(None,0))
+###assert('SE' == myfile.readat(None,0))
 
 # put some valid data in the file.
-myfile.writeat("Stest12345E",0)
+###myfile.writeat("Stest12345E",0)
 
 # I should still get 'SE' because the file wasn't closed.
-assert('SE' == myfile.readat(None,0))
+###assert('SE' == myfile.readat(None,0))
 
 #Close the file
-myfile.close()
+###myfile.close()
