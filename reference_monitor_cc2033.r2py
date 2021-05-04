@@ -1,45 +1,11 @@
 """
 This security layer inadequately handles A/B storage for files in RepyV2.
-
-
-
 Note:
     This security layer uses encasementlib.r2py, restrictions.default, repy.py and Python
     Also you need to give it an application to run.
     ** instructed to delete this?  it's in comments? -- python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py 
     -->edited as shown on zoom -- python3 repy.py encasementlib.r2py reference_monitor_cc2033.r2py attack_layer_1cc2033.r2py 
-    
-    """ 
-TYPE="type"
-ARGS="args"
-RETURN="return"
-EXCP="exceptions"
-TARGET="target"
-FUNC="func"
-OBJC="objc"
-
-class ABFile():
-  # log listfiles()                                   # added to determine what files exist if any, need to add decision tree below this
-  # files = os.listdir()
-  # log (files)
-  def __init__(self,filename,create):               # 2 parms passed from the programmer - application
-  listfiles()                                      # added to determine what files exist if any, need to add decision tree below this
-  # globals                                       need to check on init whether files exist - can use listfiles()
-    mycontext['debug'] = False   
-    # local (per object) reference to the underlying file
-    self.Afn = filename+'.a'                        # self.Afn & self.Bfn are only the file names
-    self.Bfn = filename+'.b'
-
-    # make the files and add 'SE' to the readat file...
-    if create:
-      self.Afile = openfile(self.Afn,create)        # self.Afile and self.Bfile contain the objects of self.Afn and self.Bfn to read from and write to 
-      self.Bfile = openfile(self.Bfn,create)
-      self.Afile.writeat('SE',0)
-    else:                                           # added else 3 lines to open when the init create is False
-      self.Afile = openfile(self.Afn,False)
-      self.Bfile = openfile(self.Bfn,False)
-
-    def writeat(self,data,offset):               # decreased indent to align outside if above
+""" 
     # * Test if the AB file can correctly handle writes past at the end of the file so, like we said, we have this offset, right um.
     # Q: What happens if your offset is greater than your file length does your program out crash if that's the case, 
     # or do you handle it gracefully quietly and just not allow them to write to a portion of the file that doesn't exist or read, etc.
@@ -59,13 +25,43 @@ class ABFile():
     #    close that file reopen it and then try to write valid data.
     # Those are the 10 test cases there's another one in there that's test the base case provided in the assignment description so literally does your code 
     #  run with the test case that's in the assignment description.  Plus the -10 value to avoid cheating autograder
-    # 
-    
-    
+
+TYPE="type"
+ARGS="args"
+RETURN="return"
+EXCP="exceptions"
+TARGET="target"
+FUNC="func"
+OBJC="objc"
+
+class ABFile():
+  # log listfiles()                                   # added to determine what files exist if any, need to add decision tree below this
+  # files = os.listdir()
+  # log (files)
+  def __init__(self,filename,create):               # 2 parms passed from the programmer - application
+  listfiles()                                      # added to determine what files exist if any, need to add decision tree below this
+  # globals                                       need to check on init whether files exist - can use listfiles()
+    mycontext['debug'] = False   
+    mycontext['lock'] = createlock()    ## ADDED v1
+  # local (per object) reference to the underlying file
+    self.Afn = filename+'.a'                        # self.Afn & self.Bfn are only the file names
+    self.Bfn = filename+'.b'
+    mycontext['lock'].acquire(True)   ## ADDED v1
+
+    # make the files and add 'SE' to the readat file...
+    if create:
+      self.Afile = openfile(self.Afn,create)        # self.Afile and self.Bfile contain the objects of self.Afn and self.Bfn to read from and write to 
+      self.Bfile = openfile(self.Bfn,create)
+      if (len(self.Afile.readat(None,0)) <= 2):     ## ADDED v1
+         self.Afile.writeat('SE',0)
+    else:                                           # added else 3 lines to open when the init create is False
+      self.Afile = openfile(self.Afn,False)
+      self.Bfile = openfile(self.Bfn,False)
+
+  def writeat(self,data,offset):               # decreased indent to align outside if above    
     if offset.writeat >=0 and <= len(self.Bfile)
-    
-   # Write the requested data to the B file using the sandbox's writeat call
-    self.Bfile.writeat(data,offset)
+       # Write the requested data to the B file using the sandbox's writeat call
+       self.Bfile.writeat(data,offset)
   
   def readat(self,bytes,offset):
     # Read from the A file using the sandbox's readat...
@@ -76,7 +72,7 @@ class ABFile():
   def close(self):
     self.Afile.close()
     self.Bfile.close()
-
+    mycontext['lock'].release()
 
 def ABopenfile(filename, create):
   return ABFile(filename,create)
