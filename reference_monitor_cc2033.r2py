@@ -67,8 +67,30 @@ class ABFile():
   def readat(self,bytes,offset):
     # Read from the A file using the sandbox's readat...
     return self.Afile.readat(bytes,offset)
-    if self.Afile[0] == 'S' and self.Afile[-1] == 'E'       # added this line to check validity of A file
-        pass
+    ##if self.Afile[0] == 'S' and self.Afile[-1] == 'E'       # added this line to check validity of A file
+      ## pass
+    self.lock = createlock()    #Set the Lock to Blocking
+    self.lock.acquire(True)      # Check the offset and len validation 
+    length = len(self.Afile.readat(None,0))
+    if offset < 0 or length < 0:
+       raise RepyArgumentError
+       self.lock.release()
+    elif offset >= len(self.Afile.readat(None,0)):
+       raise SeekPastEndOfFile
+       Errorself.lock.release()
+    elif bytes > length and bytes != None:
+       raise SeekPastEndOfFileError
+       self.lock.release()
+    elif (len(self.Afile.readat(None,0)) < offset+length) and bytes != None:
+       raise RepyArgumentErrorself.lock.release()
+    else:
+    #Try Reading the File else raise Exception
+       try:
+          read_data = self.Afile.readat(bytes,offset)
+          self.lock.release()
+          return read_data
+       except:
+         raise RepyArgumentError
 
   def close(self):
     self.Afile.close()
