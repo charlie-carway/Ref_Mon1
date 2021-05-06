@@ -39,11 +39,11 @@ class ABFile():
   # files = os.listdir()
   # log (files)
   def __init__(self,filename,create):               # 2 parms passed from the programmer - application
-  listfiles()                                      # added to determine what files exist if any, need to add decision tree below this
-  # globals                                       need to check on init whether files exist - can use listfiles()
+    listfiles()                                      # added to determine what files exist if any, need to add decision tree below this
+    # globals                                       need to check on init whether files exist - can use listfiles()
     mycontext['debug'] = False   
     mycontext['lock'] = createlock()    ## ADDED v1
-  # local (per object) reference to the underlying file
+    # local (per object) reference to the underlying file
     self.Afn = filename+'.a'                        # self.Afn & self.Bfn are only the file names
     self.Bfn = filename+'.b'
     mycontext['lock'].acquire(True)   ## ADDED v1
@@ -59,7 +59,7 @@ class ABFile():
       self.Bfile = openfile(self.Bfn,False)
 
   def writeat(self,data,offset):               # decreased indent to align outside if above    
-##    if offset.writeat >=0 and offset <= len(self.Bfile)
+    ##    if offset.writeat >=0 and offset <= len(self.Bfile)
     if offset >=0 and offset <= len(self.Bfile):
        # Write the requested data to the B file using the sandbox's writeat call
        ## self.lock.acquire(True)
