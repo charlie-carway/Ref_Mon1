@@ -59,9 +59,10 @@ class ABFile():
       self.Bfile = openfile(self.Bfn,False)
 
   def writeat(self,data,offset):               # decreased indent to align outside if above    
-    if offset.writeat >=0 and offset <= len(self.Bfile)
+##    if offset.writeat >=0 and offset <= len(self.Bfile)
+    if offset >=0 and offset <= len(self.Bfile)
        # Write the requested data to the B file using the sandbox's writeat call
-       self.lock.acquire(True)
+       ## self.lock.acquire(True)
        self.Bfile.writeat(data,offset)
   
   def readat(self,bytes,offset):
