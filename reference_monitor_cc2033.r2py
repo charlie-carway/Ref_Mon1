@@ -94,6 +94,9 @@ class ABFile():
          raise RepyArgumentError
 
   def close(self):
+    Bfile_content = self.Bfile.read()
+    if Bfile_content[0] == 'S' and Bfile_content[-1] == 'E':
+        self.Afile.write(Bfile_content)
     self.Afile.close()
     self.Bfile.close()
     mycontext['lock'].release()
