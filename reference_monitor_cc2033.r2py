@@ -79,6 +79,9 @@ class ABFile():
        
   def readat(self,bytes,offset):
       mycontext['lock'].acquire(True)
+      if ((offset) > (len(str(self.Afile.readat(None, 0))))):    ## new code 
+         log("Error: Can't write past EOF")                      ## new code 
+         pass                                                    ## new code 
       # Read from the A file using the sandbox's readat...
       if (type(bytes) == int and bytes < 0) or not (type(bytes)==int or bytes is None) or not (type(offset) == int) or offset < 0 or offset > len(self.Afile.readat(None,0)):
         mycontext['lock'].release()
