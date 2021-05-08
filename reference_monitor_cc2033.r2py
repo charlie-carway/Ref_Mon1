@@ -39,6 +39,7 @@ class ABFile():
   # files = os.listdir()
   # log (files)
   def __init__(self,filename,create):               # 2 parms passed from the programmer - application
+    #log("running __init__")
     listfiles()                                      # added to determine what files exist if any, need to add decision tree below this
     # globals                                       need to check on init whether files exist - can use listfiles()
     mycontext['debug'] = False   
@@ -64,7 +65,7 @@ class ABFile():
         original_text = self.original.readat(None,0)
         self.Afile.writeat(original_text,0)
         self.Bfile.writeat(original_text,0)
-        if (len(original_text(None,0)) <= 2):     ## ADDED v1  -- not needed
+        if (len(original_text) <= 2):     ## ADDED v1  -- not needed
             self.Afile.writeat('SE',0)
     else:                                       # added else 3 lines to open when the init create is False
         if filename in listfiles():
@@ -88,9 +89,10 @@ class ABFile():
             pass   ## what if user provides non-exist filename and create = false?
     mycontext['lock'].release()
 
-  def writeat(self,data,offset):               
+  def writeat(self,data,offset):    
+
     ##    if offset.writeat >=0 and offset <= len(self.Bfile)
-    if offset >=0 and offset <= len(self.Bfile) and type(data) == str:
+    if offset >=0 and offset <= len(self.Bfile.readat(None,0)) and type(data) == str:
        # Write the requested data to the B file using the sandbox's writeat call
        mycontext['lock'].acquire(True)
           ## self.lock.acquire(True)
@@ -102,9 +104,9 @@ class ABFile():
   def readat(self,bytes,offset):
       mycontext['lock'].acquire(True)
       # Read from the A file using the sandbox's readat...
-      if not (type(bytes) == int) or not (type(offset) == int) or bytes < 0 or offset < 0 or offset > len(self.Afile):
+      if (type(bytes) == int and bytes < 0) or not (type(bytes)==int or bytes is None) or not (type(offset) == int) or offset < 0 or offset > len(self.Afile.readat(None,0)):
         mycontext['lock'].release()
-        return   
+        return ""   
       Afile_text = self.Afile.readat(bytes,offset)
       mycontext['lock'].release()
       return Afile_text
@@ -137,7 +139,7 @@ class ABFile():
 
   def close(self):
     mycontext['lock'].acquire(True)
-    Bfile_content = self.Bfile.readat(none,0)
+    Bfile_content = self.Bfile.readat(None,0)
     ## Bfile_content = self.Bfile.read()
     if len(Bfile_content) >= 2 and Bfile_content[0] == 'S' and Bfile_content[-1] == 'E':
         self.original.writeat(Bfile_content,0)   ## potentially extraneous bytes at orig EOF
