@@ -64,20 +64,14 @@ class ABFile():
     mycontext['lock'].release()
 
   def writeat(self,data,offset):               
-      mycontext['lock'].acquire(True)
-      ## self.lock.acquire(True)
-    ## if offset.writeat >=0 and offset <= len(self.Bfile):
-    ## if offset >=0 and offset <= len(self.Bfile):
-     if offset < 0:
-        raise RepyArgumentError
-     elif offset > len(self.Bfile.readat(None,0)): 
-        raise SeekPastEndOfFileError
-     else:
-    # Write the requested data to the B file using the sandbox's writeat call
+    ##    if offset.writeat >=0 and offset <= len(self.Bfile)
+    if offset >=0 and offset <= len(self.Bfile):
+       # Write the requested data to the B file using the sandbox's writeat call
+       mycontext['lock'].acquire(True)
+          ## self.lock.acquire(True)
        self.Bfile.writeat(data,offset)
           ## self.lock.release(True)
-       
-     mycontext['lock'].release()
+       mycontext['lock'].release()
        
        
   def readat(self,bytes,offset):
